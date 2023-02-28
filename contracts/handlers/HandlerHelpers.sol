@@ -9,6 +9,7 @@ import "../interfaces/IERCHandler.sol";
     @notice This contract is intended to be used with the Bridge contract.
  */
 contract HandlerHelpers is IERCHandler {
+    // bridge contract address
     address public immutable _bridgeAddress;
 
     // resourceID => token contract address
@@ -56,8 +57,7 @@ contract HandlerHelpers is IERCHandler {
     }
 
     /**
-        @notice First verifies {contractAddress} is whitelisted, then sets {_burnList}[{contractAddress}]
-        to true.
+        @notice First verifies {contractAddress} is whitelisted, then sets {_burnList}[{contractAddress}] to true.
         @param contractAddress Address of contract to be used when making or executing deposits.
      */
     function setBurnable(address contractAddress) external override onlyBridge{

@@ -8,6 +8,11 @@ import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
 
+/**
+    @title Handles ERC1155 deposits and deposit executions.
+    @author ChainSafe Systems.
+    @notice This contract is intended to be used with the Bridge contract.
+ */
 contract ERC1155Handler is IDepositExecute, HandlerHelpers, ERC1155Safe, ERC1155Holder {
     using ERC165Checker for address;
 
@@ -23,10 +28,13 @@ contract ERC1155Handler is IDepositExecute, HandlerHelpers, ERC1155Safe, ERC1155
     }
 
     /**
-        @notice A deposit is initiatied by making a deposit in the Bridge contract.
+        @notice A deposit is initiated by making a deposit in the Bridge contract.
         @param resourceID ResourceID used to find address of token to be used for deposit.
         @param depositer Address of account making the deposit in the Bridge contract.
         @param data Consists of ABI-encoded arrays of tokenIDs and amounts.
+        @notice Data passed into the function should be constructed as ABI encoding of:
+        tokenIDs                                    uint256[]  bytes
+        amounts                                     uint256[]  bytes
      */
     function deposit(bytes32 resourceID, address depositer, bytes calldata data) external override onlyBridge returns (bytes memory metaData) {
         uint[] memory tokenIDs;
@@ -47,8 +55,14 @@ contract ERC1155Handler is IDepositExecute, HandlerHelpers, ERC1155Safe, ERC1155
     /**
         @notice Proposal execution should be initiated when a proposal is finalized in the Bridge contract.
         by a relayer on the deposit's destination chain.
+        @param resourceID ResourceID to be used when making deposits.
         @param data Consists of ABI-encoded {tokenIDs}, {amounts}, {recipient},
         and {transferData} of types uint[], uint[], bytes, bytes.
+        @notice Data passed into the function should be constructed as ABI encoding of:
+        tokenIDs                                    uint256[]  bytes
+        amounts                                     uint256[]  bytes
+        destinationRecipientAddress                     bytes  bytes
+        transferData                                    bytes  bytes
      */
     function executeProposal(bytes32 resourceID, bytes calldata data) external override onlyBridge {
         uint[] memory tokenIDs;
@@ -76,7 +90,7 @@ contract ERC1155Handler is IDepositExecute, HandlerHelpers, ERC1155Safe, ERC1155
 
     /**
         @notice Used to manually release ERC1155 tokens from ERC1155Safe.
-        @param data Consists of ABI-encoded {tokenAddress}, {recipient}, {tokenIDs}, 
+        @param data Consists of ABI-encoded {tokenAddress}, {recipient}, {tokenIDs},
         {amounts}, and {transferData} of types address, address, uint[], uint[], bytes.
      */
     function withdraw(bytes memory data) external override onlyBridge {

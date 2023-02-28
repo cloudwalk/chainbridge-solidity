@@ -27,7 +27,7 @@ contract ERC721Handler is IDepositExecute, HandlerHelpers, ERC721Safe {
     }
 
     /**
-        @notice A deposit is initiatied by making a deposit in the Bridge contract.
+        @notice A deposit is initiated by making a deposit in the Bridge contract.
         @param resourceID ResourceID used to find address of token to be used for deposit.
         @param depositer Address of account making the deposit in the Bridge contract.
         @param data Consists of {tokenID} padded to 32 bytes.
@@ -66,6 +66,7 @@ contract ERC721Handler is IDepositExecute, HandlerHelpers, ERC721Safe {
     /**
         @notice Proposal execution should be initiated when a proposal is finalized in the Bridge contract.
         by a relayer on the deposit's destination chain.
+        @param resourceID ResourceID to be used when making deposits.
         @param data Consists of {tokenID}, {resourceID}, {lenDestinationRecipientAddress},
         {destinationRecipientAddress}, {lenMeta}, and {metaData} all padded to 32 bytes.
         @notice Data passed into the function should be constructed as follows:

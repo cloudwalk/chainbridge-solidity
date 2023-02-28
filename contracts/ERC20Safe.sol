@@ -58,10 +58,10 @@ contract ERC20Safe {
     }
 
     /**
-        @notice used to transfer ERC20s safely
-        @param token Token instance to transfer
-        @param to Address to transfer token to
-        @param value Amount of token to transfer
+        @notice Used to transfer ERC20s safely.
+        @param token Token instance to transfer.
+        @param to Address to transfer token to.
+        @param value Amount of token to transfer.
      */
     function _safeTransfer(IERC20 token, address to, uint256 value) private {
         _safeCall(token, abi.encodeWithSelector(token.transfer.selector, to, value));
@@ -69,20 +69,20 @@ contract ERC20Safe {
 
 
     /**
-        @notice used to transfer ERC20s safely
-        @param token Token instance to transfer
-        @param from Address to transfer token from
-        @param to Address to transfer token to
-        @param value Amount of token to transfer
+        @notice Used to transfer ERC20s safely.
+        @param token Token instance to transfer.
+        @param from Address to transfer token from.
+        @param to Address to transfer token to.
+        @param value Amount of token to transfer.
      */
     function _safeTransferFrom(IERC20 token, address from, address to, uint256 value) private {
         _safeCall(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
 
     /**
-        @notice used to make calls to ERC20s safely
-        @param token Token instance call targets
-        @param data encoded call data
+        @notice Used to make calls to ERC20s safely.
+        @param token Token instance call targets.
+        @param data Encoded call data.
      */
     function _safeCall(IERC20 token, bytes memory data) private {
         uint256 tokenSize;

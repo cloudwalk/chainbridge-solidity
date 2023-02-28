@@ -9,6 +9,7 @@ import "../interfaces/IGenericHandler.sol";
     @notice This contract is intended to be used with the Bridge contract.
  */
 contract GenericHandler is IGenericHandler {
+    // bridge contract address
     address public immutable _bridgeAddress;
 
     // resourceID => contract address
