@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity 0.8.11;
-
 
 /**
  * @dev Contract module which allows children to implement an emergency stop

@@ -7,7 +7,6 @@ import "../ERC721Safe.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
-
 /**
     @title Handles ERC721 deposits and deposit executions.
     @author ChainSafe Systems.
@@ -39,11 +38,12 @@ contract ERC721Handler is IDepositExecute, HandlerHelpers, ERC721Safe {
         marked true in {_burnList}, deposited tokens will be burned, if not, they will be locked.
         @return metaData : the deposited token metadata acquired by calling a {tokenURI} method in the token contract.
      */
-    function deposit(bytes32    resourceID,
-                    address     depositer,
-                    bytes       calldata data
-                    ) external override onlyBridge returns (bytes memory metaData) {
-        uint         tokenID;
+    function deposit(
+        bytes32 resourceID,
+        address depositer,
+        bytes calldata data
+    ) external override onlyBridge returns (bytes memory metaData) {
+        uint tokenID;
 
         (tokenID) = abi.decode(data, (uint));
 
@@ -77,11 +77,11 @@ contract ERC721Handler is IDepositExecute, HandlerHelpers, ERC721Safe {
         metadata                                      bytes    bytes    (64 + len(destinationRecipientAddress) + 32) - END
      */
     function executeProposal(bytes32 resourceID, bytes calldata data) external override onlyBridge {
-        uint         tokenID;
-        uint         lenDestinationRecipientAddress;
+        uint tokenID;
+        uint lenDestinationRecipientAddress;
         bytes memory destinationRecipientAddress;
-        uint         offsetMetaData;
-        uint         lenMetaData;
+        uint offsetMetaData;
+        uint lenMetaData;
         bytes memory metaData;
 
         (tokenID, lenDestinationRecipientAddress) = abi.decode(data, (uint, uint));

@@ -18,52 +18,61 @@ contract Bridge is Pausable, AccessControl {
     // Limit relayers number because proposal can fit only so much votes
     uint256 constant public MAX_RELAYERS = 200;
 
-    uint8   public _domainID;
-    uint8   public _relayerThreshold;
+    uint8 public _domainID;
+    uint8 public _relayerThreshold;
     uint128 public _fee;
-    uint40  public _expiry;
+    uint40 public _expiry;
 
     enum ProposalStatus {Inactive, Active, Passed, Executed, Cancelled}
 
     struct Proposal {
         ProposalStatus _status;
-        uint200 _yesVotes;      // bitmap, 200 maximum votes
-        uint8   _yesVotesTotal;
-        uint40  _proposedBlock; // 1099511627775 maximum block
+        uint200 _yesVotes; // bitmap, 200 maximum votes
+        uint8 _yesVotesTotal;
+        uint40 _proposedBlock; // 1099511627775 maximum block
     }
 
     // destinationDomainID => number of deposits
     mapping(uint8 => uint64) public _depositCounts;
+
     // resourceID => handler address
     mapping(bytes32 => address) public _resourceIDToHandlerAddress;
+
     // forwarder address => is Valid
     mapping(address => bool) public isValidForwarder;
+
     // destinationDomainID + depositNonce => dataHash => Proposal
     mapping(uint72 => mapping(bytes32 => Proposal)) private _proposals;
 
     event RelayerThresholdChanged(uint256 newThreshold);
+
     event RelayerAdded(address relayer);
+
     event RelayerRemoved(address relayer);
+
     event Deposit(
-        uint8   destinationDomainID,
+        uint8 destinationDomainID,
         bytes32 resourceID,
-        uint64  depositNonce,
+        uint64 depositNonce,
         address indexed user,
         bytes data,
         bytes handlerResponse
     );
+
     event ProposalEvent(
-        uint8          originDomainID,
-        uint64         depositNonce,
+        uint8 originDomainID,
+        uint64 depositNonce,
         ProposalStatus status,
         bytes32 dataHash
     );
+
     event ProposalVote(
-        uint8   originDomainID,
-        uint64  depositNonce,
+        uint8 originDomainID,
+        uint64 depositNonce,
         ProposalStatus status,
         bytes32 dataHash
     );
+
     event FailedHandlerExecution(
         bytes lowLevelData
     );
@@ -387,7 +396,7 @@ contract Bridge is Pausable, AccessControl {
         }
 
         address sender = _msgSender();
-        
+
         require(uint(proposal._status) <= 1, "proposal already executed/cancelled");
         require(!_hasVoted(proposal, sender), "relayer already voted");
 
@@ -420,6 +429,7 @@ contract Bridge is Pausable, AccessControl {
                 emit ProposalEvent(domainID, depositNonce, ProposalStatus.Passed, dataHash);
             }
         }
+
         _proposals[nonceAndID][dataHash] = proposal;
 
         if (proposal._status == ProposalStatus.Passed) {
@@ -485,7 +495,7 @@ contract Bridge is Pausable, AccessControl {
                 return;
             }
         }
-        
+
         emit ProposalEvent(domainID, depositNonce, ProposalStatus.Executed, dataHash);
     }
 

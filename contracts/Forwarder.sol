@@ -48,7 +48,7 @@ contract Forwarder is EIP712 {
         (bool success, bytes memory returndata) = req.to.call{gas: req.gas, value: req.value}(
             abi.encodePacked(req.data, req.from)
         );
-        
+
         assert(gasleft() > req.gas / 63);
 
         return (success, returndata);

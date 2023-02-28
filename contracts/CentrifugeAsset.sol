@@ -20,6 +20,7 @@ contract CentrifugeAsset {
       require(!_assetsStored[asset], "asset is already stored");
 
       _assetsStored[asset] = true;
+
       emit AssetStored(asset);
   }
 }

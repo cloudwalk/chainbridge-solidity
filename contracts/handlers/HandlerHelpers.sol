@@ -28,12 +28,12 @@ contract HandlerHelpers is IERCHandler {
         _onlyBridge();
         _;
     }
-    
+
     /**
         @param bridgeAddress Contract address of previously deployed Bridge.
      */
     constructor(
-        address          bridgeAddress
+        address bridgeAddress
     ) {
         _bridgeAddress = bridgeAddress;
     }
@@ -52,7 +52,6 @@ contract HandlerHelpers is IERCHandler {
         @param contractAddress Address of contract to be called when a deposit is made and a deposited is executed.
      */
     function setResource(bytes32 resourceID, address contractAddress) external override onlyBridge {
-
         _setResource(resourceID, contractAddress);
     }
 
@@ -60,7 +59,7 @@ contract HandlerHelpers is IERCHandler {
         @notice First verifies {contractAddress} is whitelisted, then sets {_burnList}[{contractAddress}] to true.
         @param contractAddress Address of contract to be used when making or executing deposits.
      */
-    function setBurnable(address contractAddress) external override onlyBridge{
+    function setBurnable(address contractAddress) external override onlyBridge {
         _setBurnable(contractAddress);
     }
 

@@ -15,7 +15,7 @@ contract ERC20Handler is IDepositExecute, HandlerHelpers, ERC20Safe {
         @param bridgeAddress Contract address of previously deployed Bridge.
      */
     constructor(
-        address          bridgeAddress
+        address bridgeAddress
     ) HandlerHelpers(bridgeAddress) {
     }
 
@@ -33,9 +33,10 @@ contract ERC20Handler is IDepositExecute, HandlerHelpers, ERC20Safe {
     function deposit(
         bytes32 resourceID,
         address depositer,
-        bytes   calldata data
+        bytes calldata data
     ) external override onlyBridge returns (bytes memory) {
-        uint256        amount;
+        uint256 amount;
+
         (amount) = abi.decode(data, (uint));
 
         address tokenAddress = _resourceIDToTokenContractAddress[resourceID];
@@ -60,9 +61,9 @@ contract ERC20Handler is IDepositExecute, HandlerHelpers, ERC20Safe {
         destinationRecipientAddress            bytes       bytes  64 - END
      */
     function executeProposal(bytes32 resourceID, bytes calldata data) external override onlyBridge {
-        uint256       amount;
-        uint256       lenDestinationRecipientAddress;
-        bytes  memory destinationRecipientAddress;
+        uint256 amount;
+        uint256 lenDestinationRecipientAddress;
+        bytes memory destinationRecipientAddress;
 
         (amount, lenDestinationRecipientAddress) = abi.decode(data, (uint, uint));
         destinationRecipientAddress = bytes(data[64:64 + lenDestinationRecipientAddress]);

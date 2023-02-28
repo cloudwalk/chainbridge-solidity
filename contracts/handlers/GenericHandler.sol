@@ -43,7 +43,7 @@ contract GenericHandler is IGenericHandler {
         @param bridgeAddress Contract address of previously deployed Bridge.
      */
     constructor(
-        address          bridgeAddress
+        address bridgeAddress
     ) {
         _bridgeAddress = bridgeAddress;
     }
@@ -70,7 +70,6 @@ contract GenericHandler is IGenericHandler {
         uint256 depositFunctionDepositerOffset,
         bytes4 executeFunctionSig
     ) external onlyBridge override {
-
         _setResource(resourceID, contractAddress, depositFunctionSig, depositFunctionDepositerOffset, executeFunctionSig);
     }
 
@@ -88,7 +87,7 @@ contract GenericHandler is IGenericHandler {
         @return Returns the raw bytes returned from the call to {contractAddress}.
      */
     function deposit(bytes32 resourceID, address depositer, bytes calldata data) external onlyBridge returns (bytes memory) {
-        uint256      lenMetadata;
+        uint256 lenMetadata;
         bytes memory metadata;
 
         lenMetadata = abi.decode(data, (uint256));
@@ -129,7 +128,7 @@ contract GenericHandler is IGenericHandler {
         {metaData} is expected to consist of needed function arguments.
      */
     function executeProposal(bytes32 resourceID, bytes calldata data) external onlyBridge {
-        uint256      lenMetadata;
+        uint256 lenMetadata;
         bytes memory metaData;
 
         lenMetadata = abi.decode(data, (uint256));

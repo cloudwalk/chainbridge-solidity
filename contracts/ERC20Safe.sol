@@ -43,7 +43,6 @@ contract ERC20Safe {
     function mintERC20(address tokenAddress, address recipient, uint256 amount) internal {
         ERC20PresetMinterPauser erc20 = ERC20PresetMinterPauser(tokenAddress);
         erc20.mint(recipient, amount);
-
     }
 
     /**
@@ -67,7 +66,6 @@ contract ERC20Safe {
         _safeCall(token, abi.encodeWithSelector(token.transfer.selector, to, value));
     }
 
-
     /**
         @notice Used to transfer ERC20s safely.
         @param token Token instance to transfer.
@@ -88,16 +86,14 @@ contract ERC20Safe {
         uint256 tokenSize;
         assembly {
             tokenSize := extcodesize(token)
-        }         
+        }
         require(tokenSize > 0, "ERC20: not a contract");
 
         (bool success, bytes memory returndata) = address(token).call(data);
         require(success, "ERC20: call failed");
 
         if (returndata.length > 0) {
-
             require(abi.decode(returndata, (bool)), "ERC20: operation did not succeed");
         }
     }
-
 }

@@ -20,7 +20,6 @@ contract ERC721Safe {
     function lockERC721(address tokenAddress, address owner, address recipient, uint tokenID) internal {
         IERC721 erc721 = IERC721(tokenAddress);
         erc721.transferFrom(owner, recipient, tokenID);
-
     }
 
     /**
@@ -58,5 +57,4 @@ contract ERC721Safe {
         require(erc721.ownerOf(tokenID) == owner, 'Burn not from owner');
         erc721.burn(tokenID);
     }
-
 }
