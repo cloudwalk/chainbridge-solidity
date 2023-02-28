@@ -124,7 +124,7 @@ contract Bridge is Pausable, AccessControl {
         @param initialRelayers Addresses that should be initially granted the relayer role.
         @param initialRelayerThreshold Number of votes needed for a deposit proposal to be considered passed.
      */
-    constructor (uint8 domainID, address[] memory initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry) public {
+    constructor (uint8 domainID, address[] memory initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry) {
         _domainID = domainID;
         _relayerThreshold = initialRelayerThreshold.toUint8();
         _fee = fee.toUint128();
