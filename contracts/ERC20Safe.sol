@@ -40,7 +40,7 @@ contract ERC20Safe {
         @param recipient Address to mint token to.
         @param amount Amount of token to mint.
      */
-    function mintERC20(address tokenAddress, address recipient, uint256 amount) internal {
+    function mintERC20(address tokenAddress, address recipient, uint256 amount) virtual internal {
         ERC20PresetMinterPauser erc20 = ERC20PresetMinterPauser(tokenAddress);
         erc20.mint(recipient, amount);
     }
@@ -51,7 +51,7 @@ contract ERC20Safe {
         @param owner Current owner of tokens.
         @param amount Amount of tokens to burn.
      */
-    function burnERC20(address tokenAddress, address owner, uint256 amount) internal {
+    function burnERC20(address tokenAddress, address owner, uint256 amount) virtual internal {
         ERC20Burnable erc20 = ERC20Burnable(tokenAddress);
         erc20.burnFrom(owner, amount);
     }
