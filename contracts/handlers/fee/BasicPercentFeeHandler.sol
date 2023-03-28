@@ -18,9 +18,14 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
     // multiplied by 100 to avoid precision loss
     uint16 public _feePercent;
 
+    // the minimum amount of fee for each of resource id
+    mapping (bytes32 => uint32) public _minimumFeeAmount;
+
     event FeePercentChanged(
         uint256 newFeePercent
     );
+
+    event MinimumFeeAmountChanged(bytes32 resourceID, uint32 amount);
 
     modifier onlyAdmin() {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "sender doesn't have admin role");
@@ -91,6 +96,9 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
     ) internal view returns(uint256 fee, address tokenAddress) {
         uint256 amount = abi.decode(depositData, (uint256));
         fee = amount * _feePercent / 1e4; // 100 for percent and 100 to avoid precision loss
+        if (fee < _minimumFeeAmount[resourceID]) {
+            fee = _minimumFeeAmount[resourceID];
+        }
         address tokenHandler = IBridge(_bridgeAddress)._resourceIDToHandlerAddress(resourceID);
         tokenAddress = IERCHandler(tokenHandler)._resourceIDToTokenContractAddress(resourceID);
     }
@@ -134,5 +142,11 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
         require(newAdmin != sender, 'Cannot be zero address');
         grantRole(DEFAULT_ADMIN_ROLE, newAdmin);
         renounceRole(DEFAULT_ADMIN_ROLE, sender);
+    }
+
+    function changeMinimumFeeAmount(bytes32 resourceID, uint32 amount) external onlyAdmin {
+        require(_minimumFeeAmount[resourceID] != amount, "fee already configured");
+        _minimumFeeAmount[resourceID] = amount;
+        emit MinimumFeeAmountChanged(resourceID, amount);
     }
 }
