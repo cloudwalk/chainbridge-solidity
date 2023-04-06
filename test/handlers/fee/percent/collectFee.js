@@ -6,9 +6,9 @@ const Helpers = require("../../../helpers");
 const BridgeContract = artifacts.require("Bridge");
 const ERC20MintableContract = artifacts.require("ERC20PresetMinterPauser");
 const ERC20HandlerContract = artifacts.require("ERC20Handler");
-const BasicFeeHandlerContract = artifacts.require("BasicPercentFeeHandler");
+const PercentFeeHandlerContract = artifacts.require("PercentFeeHandler");
 
-contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
+contract("PercentFeeHandler - [collectFee]", (accounts) => {
   const relayerThreshold = 0;
   const originDomainID = 1;
   const destinationDomainID = 2;
@@ -22,7 +22,7 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
   let BridgeInstance;
   let ERC20MintableInstance;
   let ERC20HandlerInstance;
-  let BasicFeeHandlerInstance;
+  let PercentFeeHandlerInstance;
   let resourceID;
   let depositData;
 
@@ -41,7 +41,7 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
       BridgeInstance.adminSetResource(ERC20HandlerInstance.address, resourceID, ERC20MintableInstance.address),
     ]);
 
-    BasicFeeHandlerInstance = await BasicFeeHandlerContract.new(BridgeInstance.address);
+    PercentFeeHandlerInstance = await PercentFeeHandlerContract.new(BridgeInstance.address);
 
     await ERC20MintableInstance.approve(ERC20HandlerInstance.address, depositAmount, { from: depositerAddress });
 
@@ -55,13 +55,13 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
   });
 
   it("should collect fee", async () => {
-    await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
+    await BridgeInstance.adminChangeFeeHandler(PercentFeeHandlerInstance.address);
     await ERC20MintableInstance.mint(depositerAddress, 100000000000);
     await ERC20MintableInstance.increaseAllowance(BridgeInstance.address, 100000000000, { from: depositerAddress });
-    await ERC20MintableInstance.increaseAllowance(BasicFeeHandlerInstance.address, 100000000000, { from: depositerAddress });
+    await ERC20MintableInstance.increaseAllowance(PercentFeeHandlerInstance.address, 100000000000, { from: depositerAddress });
     await ERC20MintableInstance.increaseAllowance(ERC20HandlerInstance.address, 100000000000, { from: depositerAddress });
     const feePercent = 5000; // 50%
-    let res = await BasicFeeHandlerInstance.calculateFee.call(
+    let res = await PercentFeeHandlerInstance.calculateFee.call(
       relayer,
       originDomainID,
       destinationDomainID,
@@ -71,10 +71,10 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
     );
     assert.equal(res[0], 0);
     // Change fee to 50%
-    await BasicFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
-    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, depositAmount * 2);
+    await PercentFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
+    await PercentFeeHandlerInstance.changeMaximumFeeAmount(resourceID, depositAmount * 2);
 
-    let afterRes = await BasicFeeHandlerInstance.calculateFee.call(
+    let afterRes = await PercentFeeHandlerInstance.calculateFee.call(
         relayer,
         originDomainID,
         destinationDomainID,
@@ -91,9 +91,9 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
   });
 
   it("deposit should revert if invalid fee amount supplied", async () => {
-    await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
+    await BridgeInstance.adminChangeFeeHandler(PercentFeeHandlerInstance.address);
     // Current fee is set to 0%
-    assert.equal(await BasicFeeHandlerInstance._feePercent(resourceID), 0);
+    assert.equal(await PercentFeeHandlerInstance._feePercent(resourceID), 0);
 
     await TruffleAssert.reverts(
       BridgeInstance.deposit(domainID, resourceID, depositData, feeData, {

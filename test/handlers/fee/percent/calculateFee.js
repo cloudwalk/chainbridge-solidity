@@ -3,9 +3,9 @@ const Helpers = require("../../../helpers");
 const BridgeContract = artifacts.require("Bridge");
 const ERC20MintableContract = artifacts.require("ERC20PresetMinterPauser");
 const ERC20HandlerContract = artifacts.require("ERC20Handler");
-const BasicFeeHandlerContract = artifacts.require("BasicPercentFeeHandler");
+const PercentFeeHandlerContract = artifacts.require("PercentFeeHandler");
 
-contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
+contract("PercentFeeHandler - [calculateFee]", async (accounts) => {
   const relayerThreshold = 0;
   const originDomainID = 1;
   const destinationDomainID = 2;
@@ -15,7 +15,7 @@ contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
 
   let BridgeInstance;
   let ERC20MintableInstance;
-  let BasicFeeHandlerInstance;
+  let PercentFeeHandlerInstance;
   let resourceID;
   let depositData;
 
@@ -27,7 +27,7 @@ contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
 
     resourceID = Helpers.createResourceID(ERC20MintableInstance.address, originDomainID);
 
-    BasicFeeHandlerInstance = await BasicFeeHandlerContract.new(BridgeInstance.address);
+    PercentFeeHandlerInstance = await PercentFeeHandlerContract.new(BridgeInstance.address);
 
     ERC20HandlerInstance = await ERC20HandlerContract.new(BridgeInstance.address);
 
@@ -35,13 +35,13 @@ contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
   });
 
   it("should return amount of fee", async () => {
-    await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
+    await BridgeInstance.adminChangeFeeHandler(PercentFeeHandlerInstance.address);
     const feePercent = 5000; // 50%
     const minFeeAmount = 400;
     const maxFeeAmount = 600;
     depositData = web3.eth.abi.encodeParameter("uint256", depositAmount);
     // Current fee is set to 0%
-    let res = await BasicFeeHandlerInstance.calculateFee.call(
+    let res = await PercentFeeHandlerInstance.calculateFee.call(
       relayer,
       originDomainID,
       destinationDomainID,
@@ -51,10 +51,10 @@ contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
     );
     assert.equal(res[0], 0);
     // Change fee to 50%
-    await BasicFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
-    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
-    await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
-    res = await BasicFeeHandlerInstance.calculateFee.call(
+    await PercentFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
+    await PercentFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
+    await PercentFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
+    res = await PercentFeeHandlerInstance.calculateFee.call(
       relayer,
       originDomainID,
       destinationDomainID,
@@ -62,7 +62,7 @@ contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
       depositData,
       feeData
     );
-    const feeObj = await BasicFeeHandlerInstance.calculateFee(
+    const feeObj = await PercentFeeHandlerInstance.calculateFee(
       relayer,
       originDomainID,
       destinationDomainID,

@@ -3,9 +3,9 @@ const Helpers = require("../../../helpers");
 const BridgeContract = artifacts.require("Bridge");
 const ERC20MintableContract = artifacts.require("ERC20PresetMinterPauser");
 const ERC20HandlerContract = artifacts.require("ERC20Handler");
-const BasicFeeHandlerContract = artifacts.require("BasicPercentFeeHandler");
+const PercentFeeHandlerContract = artifacts.require("PercentFeeHandler");
 
-contract("BasicPercentFeeHandler - [constructor]", (accounts) => {
+contract("PercentFeeHandler - [constructor]", (accounts) => {
   const relayerThreshold = 0;
   const adminRole = "0x0000000000000000000000000000000000000000000000000000000000000000";
   const domainID = 1;
@@ -15,7 +15,7 @@ contract("BasicPercentFeeHandler - [constructor]", (accounts) => {
   let BridgeInstance;
   let ERC20MintableInstance;
   let ERC20HandlerInstance;
-  let BasicFeeHandlerInstance;
+  let PercentFeeHandlerInstance;
   let resourceID;
 
   beforeEach(async () => {
@@ -35,13 +35,13 @@ contract("BasicPercentFeeHandler - [constructor]", (accounts) => {
 
     await ERC20MintableInstance.approve(ERC20HandlerInstance.address, depositAmount, { from: depositerAddress });
 
-    BasicFeeHandlerInstance = await BasicFeeHandlerContract.new(BridgeInstance.address);
+    PercentFeeHandlerInstance = await PercentFeeHandlerContract.new(BridgeInstance.address);
   });
 
   it("correctly sets values in the constructor", async () => {
-    const bridgeAddress = await BasicFeeHandlerInstance._bridgeAddress();
-    const adminRoleHash = await BasicFeeHandlerInstance.DEFAULT_ADMIN_ROLE();
-    const deployerIsAdmin = await BasicFeeHandlerInstance.hasRole(adminRole, accounts[0]);
+    const bridgeAddress = await PercentFeeHandlerInstance._bridgeAddress();
+    const adminRoleHash = await PercentFeeHandlerInstance.DEFAULT_ADMIN_ROLE();
+    const deployerIsAdmin = await PercentFeeHandlerInstance.hasRole(adminRole, accounts[0]);
 
     assert.strictEqual(bridgeAddress, BridgeInstance.address);
     assert.strictEqual(adminRoleHash, adminRole);

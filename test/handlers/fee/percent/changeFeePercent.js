@@ -5,9 +5,9 @@ const Helpers = require("../../../helpers");
 const BridgeContract = artifacts.require("Bridge");
 const ERC20MintableContract = artifacts.require("ERC20PresetMinterPauser");
 const ERC20HandlerContract = artifacts.require("ERC20Handler");
-const BasicFeeHandlerContract = artifacts.require("BasicPercentFeeHandler");
+const PercentFeeHandlerContract = artifacts.require("PercentFeeHandler");
 
-contract("BasicPercentFeeHandler - [changeFeePercent]", async (accounts) => {
+contract("PercentFeeHandler - [changeFeePercent]", async (accounts) => {
   const relayerThreshold = 0;
   const domainID = 1;
   const initialRelayers = accounts.slice(0, 3);
@@ -18,7 +18,7 @@ contract("BasicPercentFeeHandler - [changeFeePercent]", async (accounts) => {
 
   let BridgeInstance;
   let ERC20MintableInstance;
-  let BasicFeeHandlerInstance;
+  let PercentFeeHandlerInstance;
   let resourceID;
 
   beforeEach(async () => {
@@ -29,7 +29,7 @@ contract("BasicPercentFeeHandler - [changeFeePercent]", async (accounts) => {
 
     resourceID = Helpers.createResourceID(ERC20MintableInstance.address, domainID);
 
-    BasicFeeHandlerInstance = await BasicFeeHandlerContract.new(BridgeInstance.address);
+    PercentFeeHandlerInstance = await PercentFeeHandlerContract.new(BridgeInstance.address);
 
     ERC20HandlerInstance = await ERC20HandlerContract.new(BridgeInstance.address);
 
@@ -37,24 +37,24 @@ contract("BasicPercentFeeHandler - [changeFeePercent]", async (accounts) => {
   });
 
   it("contract should be deployed successfully", async () => {
-    TruffleAssert.passes(await BasicFeeHandlerContract.new(BridgeInstance.address));
+    TruffleAssert.passes(await PercentFeeHandlerContract.new(BridgeInstance.address));
   });
 
   it("should set fee percent", async () => {
     const feePercent = 50;
-    await BasicFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
-    const newFeePercent = await BasicFeeHandlerInstance._feePercent.call(resourceID);
+    await PercentFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
+    const newFeePercent = await PercentFeeHandlerInstance._feePercent.call(resourceID);
     assert.equal(newFeePercent, 50);
   });
 
   it("should not set the same fee percent", async () => {
     await TruffleAssert.reverts(
-      BasicFeeHandlerInstance.changeFeePercent(resourceID, 0),
+      PercentFeeHandlerInstance.changeFeePercent(resourceID, 0),
       "new fee percent is equal to current fee"
     );
   });
 
   it("should require admin role to change fee percent", async () => {
-    await assertOnlyAdmin(BasicFeeHandlerInstance.changeFeePercent, resourceID, 1);
+    await assertOnlyAdmin(PercentFeeHandlerInstance.changeFeePercent, resourceID, 1);
   });
 });

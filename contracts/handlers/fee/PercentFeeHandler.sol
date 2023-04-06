@@ -11,7 +11,7 @@ import "../../ERC20Safe.sol";
     @author ChainSafe Systems.
     @notice This contract is intended to be used with the Bridge contract.
  */
-contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
+contract PercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
     // bridge contract address
     address public immutable _bridgeAddress;
 
