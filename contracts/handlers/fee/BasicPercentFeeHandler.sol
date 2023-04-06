@@ -21,11 +21,16 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
     // the minimum amount of fee for each of resource id
     mapping (bytes32 => uint32) public _minimumFeeAmount;
 
+    // the maximum amount of fee for each of resource id
+    mapping (bytes32 => uint32) public _maximumFeeAmount;
+
     event FeePercentChanged(
         uint256 newFeePercent
     );
 
     event MinimumFeeAmountChanged(bytes32 indexed resourceID, uint32 newFeeMinAmount);
+
+    event MaximumFeeAmountChanged(bytes32 indexed resourceID, uint32 newFeeMaxAmount);
 
     modifier onlyAdmin() {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "sender doesn't have admin role");
@@ -94,10 +99,15 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
         bytes32 resourceID,
         bytes calldata depositData
     ) internal view returns(uint256 fee, address tokenAddress) {
-        uint256 amount = abi.decode(depositData, (uint256));
-        fee = amount * _feePercent / 1e4; // 100 for percent and 100 to avoid precision loss
-        if (fee < _minimumFeeAmount[resourceID]) {
-            fee = _minimumFeeAmount[resourceID];
+        if(_feePercent[resourceID] != 0) {
+            uint256 amount = abi.decode(depositData, (uint256));
+            // 100 for percent and 100 to avoid precision loss
+            fee = amount * _feePercent[resourceID] / 1e4;
+            if (fee < _minimumFeeAmount[resourceID]) {
+                fee = _minimumFeeAmount[resourceID];
+            } else if (fee > _maximumFeeAmount[resourceID]) {
+                fee = _maximumFeeAmount[resourceID];
+            }
         }
         address tokenHandler = IBridge(_bridgeAddress)._resourceIDToHandlerAddress(resourceID);
         tokenAddress = IERCHandler(tokenHandler)._resourceIDToTokenContractAddress(resourceID);
@@ -152,7 +162,21 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
      */
     function changeMinimumFeeAmount(bytes32 resourceID, uint32 newMinAmount) external onlyAdmin {
         require(_minimumFeeAmount[resourceID] != newMinAmount, "minimum fee amount already configured");
+        require(_maximumFeeAmount[resourceID] >= newMinAmount, "minimum fee amount is greater than maximum fee");
         _minimumFeeAmount[resourceID] = newMinAmount;
         emit MinimumFeeAmountChanged(resourceID, newMinAmount);
+    }
+
+    /**
+        @notice Sets new value of the maximum fee amount.
+        @notice Only callable by admin.
+        @param resourceID ResourceID of the token.
+        @param newMaxAmount Value {_maximumFeeAmount} will be updated to.
+     */
+    function changeMaximumFeeAmount(bytes32 resourceID, uint32 newMaxAmount) external onlyAdmin {
+        require(_maximumFeeAmount[resourceID] != newMaxAmount, "maximum fee amount already configured");
+        require(_minimumFeeAmount[resourceID] <= newMaxAmount, "maximum fee amount is less than minimum fee");
+        _maximumFeeAmount[resourceID] = newMaxAmount;
+        emit MaximumFeeAmountChanged(resourceID, newMaxAmount);
     }
 }

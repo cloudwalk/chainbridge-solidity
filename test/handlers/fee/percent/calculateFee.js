@@ -38,6 +38,7 @@ contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
     await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
     const feePercent = 5000; // 50%
     const minFeeAmount = 400;
+    const maxFeeAmount = 600;
     depositData = web3.eth.abi.encodeParameter("uint256", depositAmount);
     // Current fee is set to 0%
     let res = await BasicFeeHandlerInstance.calculateFee.call(
@@ -51,6 +52,7 @@ contract("BasicPercentFeeHandler - [calculateFee]", async (accounts) => {
     assert.equal(res[0], 0);
     // Change fee to 50%
     await BasicFeeHandlerInstance.changeFeePercent(feePercent);
+    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
     await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
     res = await BasicFeeHandlerInstance.calculateFee.call(
       relayer,

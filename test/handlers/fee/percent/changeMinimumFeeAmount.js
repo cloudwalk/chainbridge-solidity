@@ -45,6 +45,7 @@ contract("BasicPercentFeeHandler - [changeMinimumFeeAmount]", async (accounts) =
     await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
     const feePercent = 1000; // 10%
     const minFeeAmount = 400;
+    const maxFeeAmount = 600;
     depositData = web3.eth.abi.encodeParameter("uint256", depositAmount);
     // Current fee is set to 0%
     let res = await BasicFeeHandlerInstance.calculateFee.call(
@@ -58,6 +59,7 @@ contract("BasicPercentFeeHandler - [changeMinimumFeeAmount]", async (accounts) =
     assert.equal(res[0], 0);
     // Change fee to 10%
     await BasicFeeHandlerInstance.changeFeePercent(feePercent);
+    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
     await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
     res = await BasicFeeHandlerInstance.calculateFee.call(
       relayer,
@@ -79,10 +81,50 @@ contract("BasicPercentFeeHandler - [changeMinimumFeeAmount]", async (accounts) =
     assert.equal(feeObj[0], expectedFee);
   });
 
+  it("should return maximum amount of fee", async () => {
+    await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
+    const feePercent = 9000; // 90%
+    const minFeeAmount = 400;
+    const maxFeeAmount = 600;
+    depositData = web3.eth.abi.encodeParameter("uint256", depositAmount);
+    // Current fee is set to 0%
+    let res = await BasicFeeHandlerInstance.calculateFee.call(
+      relayer,
+      originDomainID,
+      destinationDomainID,
+      resourceID,
+      depositData,
+      feeData
+    );
+    assert.equal(res[0], 0);
+    // Change fee to 90%
+    await BasicFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
+    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
+    await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
+    res = await BasicFeeHandlerInstance.calculateFee.call(
+      relayer,
+      originDomainID,
+      destinationDomainID,
+      resourceID,
+      depositData,
+      feeData
+    );
+    const feeObj = await BasicFeeHandlerInstance.calculateFee(
+      relayer,
+      originDomainID,
+      destinationDomainID,
+      resourceID,
+      depositData,
+      feeData
+    );
+    assert.equal(feeObj[0], maxFeeAmount);
+  });
+
   it("should return percent amount of fee", async () => {
     await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
     const feePercent = 5000; //50%
     const minFeeAmount = 400;
+    const maxFeeAmount = 600;
     depositData = web3.eth.abi.encodeParameter("uint256", depositAmount);
     // Current fee is set to 0%
     let res = await BasicFeeHandlerInstance.calculateFee.call(
@@ -96,6 +138,7 @@ contract("BasicPercentFeeHandler - [changeMinimumFeeAmount]", async (accounts) =
     assert.equal(res[0], 0);
     // Change fee to 50%
     await BasicFeeHandlerInstance.changeFeePercent(feePercent);
+    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
     await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
     res = await BasicFeeHandlerInstance.calculateFee.call(
       relayer,
@@ -117,8 +160,35 @@ contract("BasicPercentFeeHandler - [changeMinimumFeeAmount]", async (accounts) =
     assert.equal(feeObj[0], expectedFee);
   });
 
+  it("should revert if maximum fee is less than minimum fee", async () => {
+    const minFeeAmount = 400;
+    const maxFeeAmount = 600;
+    await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
+    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
+    await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
+    await TruffleAssert.reverts(
+      BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, minFeeAmount - 1),
+      "maximum fee amount is less than minimum fee"
+    );
+  });
+
+  it("should revert if minimum fee is greater than maximum fee", async () => {
+    const maxFeeAmount = 600;
+    await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
+    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
+    await TruffleAssert.reverts(
+      BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, maxFeeAmount + 1),
+      "minimum fee amount is greater than maximum fee"
+    );
+  });
+
   it("should require admin role to change minimum fee amount", async () => {
     const BasicFeeHandlerInstance = await BasicFeeHandlerContract.new(BridgeInstance.address);
     await assertOnlyAdmin(BasicFeeHandlerInstance.changeMinimumFeeAmount, resourceID, 1);
+  });
+
+  it("should require admin role to change maximum fee amount", async () => {
+    const BasicFeeHandlerInstance = await BasicFeeHandlerContract.new(BridgeInstance.address);
+    await assertOnlyAdmin(BasicFeeHandlerInstance.changeMaximumFeeAmount, resourceID, 1);
   });
 });
