@@ -72,6 +72,7 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
     assert.equal(res[0], 0);
     // Change fee to 50%
     await BasicFeeHandlerInstance.changeFeePercent(feePercent);
+    await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, depositAmount * 2);
 
     let afterRes = await BasicFeeHandlerInstance.calculateFee.call(
         relayer,

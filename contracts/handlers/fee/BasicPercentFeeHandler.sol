@@ -25,7 +25,7 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
         uint256 newFeePercent
     );
 
-    event MinimumFeeAmountChanged(bytes32 resourceID, uint32 amount);
+    event MinimumFeeAmountChanged(bytes32 indexed resourceID, uint32 newFeeMinAmount);
 
     modifier onlyAdmin() {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "sender doesn't have admin role");
@@ -144,9 +144,15 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
         renounceRole(DEFAULT_ADMIN_ROLE, sender);
     }
 
-    function changeMinimumFeeAmount(bytes32 resourceID, uint32 amount) external onlyAdmin {
-        require(_minimumFeeAmount[resourceID] != amount, "fee already configured");
-        _minimumFeeAmount[resourceID] = amount;
-        emit MinimumFeeAmountChanged(resourceID, amount);
+    /**
+        @notice Sets new value of the minimum fee amount.
+        @notice Only callable by admin.
+        @param resourceID ResourceID of the token.
+        @param newMinAmount Value {_minimumFeeAmount} will be updated to.
+     */
+    function changeMinimumFeeAmount(bytes32 resourceID, uint32 newMinAmount) external onlyAdmin {
+        require(_minimumFeeAmount[resourceID] != newMinAmount, "minimum fee amount already configured");
+        _minimumFeeAmount[resourceID] = newMinAmount;
+        emit MinimumFeeAmountChanged(resourceID, newMinAmount);
     }
 }
