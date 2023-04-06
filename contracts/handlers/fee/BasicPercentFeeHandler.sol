@@ -109,7 +109,7 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
         @param newFeePercent Value {_feePercent} will be updated to.
      */
     function changeFeePercent(uint16 newFeePercent) external onlyAdmin {
-        require(_feePercent != newFeePercent, "Current fee is equal to new fee");
+        require(_feePercent != newFeePercent, "current fee is equal to new fee");
         _feePercent = newFeePercent;
         emit FeePercentChanged(newFeePercent);
     }
@@ -138,8 +138,8 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
      */
     function renounceAdmin(address newAdmin) external {
         address sender = _msgSender();
-        require(newAdmin != address(0), 'Cannot renounce oneself');
-        require(newAdmin != sender, 'Cannot be zero address');
+        require(newAdmin != address(0), 'cannot renounce oneself');
+        require(newAdmin != sender, 'cannot be zero address');
         grantRole(DEFAULT_ADMIN_ROLE, newAdmin);
         renounceRole(DEFAULT_ADMIN_ROLE, sender);
     }
