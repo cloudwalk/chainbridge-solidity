@@ -71,7 +71,7 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
     );
     assert.equal(res[0], 0);
     // Change fee to 50%
-    await BasicFeeHandlerInstance.changeFeePercent(feePercent);
+    await BasicFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
     await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, depositAmount * 2);
 
     let afterRes = await BasicFeeHandlerInstance.calculateFee.call(
@@ -93,7 +93,7 @@ contract("BasicPercentFeeHandler - [collectFee]", (accounts) => {
   it("deposit should revert if invalid fee amount supplied", async () => {
     await BridgeInstance.adminChangeFeeHandler(BasicFeeHandlerInstance.address);
     // Current fee is set to 0%
-    assert.equal(await BasicFeeHandlerInstance._feePercent(), 0);
+    assert.equal(await BasicFeeHandlerInstance._feePercent(resourceID), 0);
 
     await TruffleAssert.reverts(
       BridgeInstance.deposit(domainID, resourceID, depositData, feeData, {

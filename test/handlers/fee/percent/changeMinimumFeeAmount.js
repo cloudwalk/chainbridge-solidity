@@ -58,7 +58,7 @@ contract("BasicPercentFeeHandler - [changeMinimumFeeAmount]", async (accounts) =
     );
     assert.equal(res[0], 0);
     // Change fee to 10%
-    await BasicFeeHandlerInstance.changeFeePercent(feePercent);
+    await BasicFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
     await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
     await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
     res = await BasicFeeHandlerInstance.calculateFee.call(
@@ -137,7 +137,7 @@ contract("BasicPercentFeeHandler - [changeMinimumFeeAmount]", async (accounts) =
     );
     assert.equal(res[0], 0);
     // Change fee to 50%
-    await BasicFeeHandlerInstance.changeFeePercent(feePercent);
+    await BasicFeeHandlerInstance.changeFeePercent(resourceID, feePercent);
     await BasicFeeHandlerInstance.changeMaximumFeeAmount(resourceID, maxFeeAmount);
     await BasicFeeHandlerInstance.changeMinimumFeeAmount(resourceID, minFeeAmount);
     res = await BasicFeeHandlerInstance.calculateFee.call(

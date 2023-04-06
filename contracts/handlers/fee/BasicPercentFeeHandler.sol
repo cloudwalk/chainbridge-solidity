@@ -16,7 +16,7 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
     address public immutable _bridgeAddress;
 
     // multiplied by 100 to avoid precision loss
-    uint16 public _feePercent;
+    mapping (bytes32 => uint16) public _feePercent;
 
     // the minimum amount of fee for each of resource id
     mapping (bytes32 => uint32) public _minimumFeeAmount;
@@ -24,9 +24,7 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
     // the maximum amount of fee for each of resource id
     mapping (bytes32 => uint32) public _maximumFeeAmount;
 
-    event FeePercentChanged(
-        uint256 newFeePercent
-    );
+    event FeePercentChanged(bytes32 indexed resourceID, uint256 newFeePercent);
 
     event MinimumFeeAmountChanged(bytes32 indexed resourceID, uint32 newFeeMinAmount);
 
@@ -118,10 +116,10 @@ contract BasicPercentFeeHandler is IFeeHandler, AccessControl, ERC20Safe {
         @notice Only callable by admin.
         @param newFeePercent Value {_feePercent} will be updated to.
      */
-    function changeFeePercent(uint16 newFeePercent) external onlyAdmin {
-        require(_feePercent != newFeePercent, "current fee is equal to new fee");
-        _feePercent = newFeePercent;
-        emit FeePercentChanged(newFeePercent);
+    function changeFeePercent(bytes32 resourceID, uint16 newFeePercent) external onlyAdmin {
+        require(_feePercent[resourceID] != newFeePercent, "new fee percent is equal to current fee");
+        _feePercent[resourceID] = newFeePercent;
+        emit FeePercentChanged(resourceID, newFeePercent);
     }
 
     /**
